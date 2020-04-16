@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <style>
+
+    </style>
+    <script src="https://unpkg.com/tone@13.8.25/build/Tone.js"></script>
+        <script src="https://unpkg.com/ml5@0.4.3/dist/ml5.min.js"></script>
+      </head>
+
+<div id="canvascontainer"></div>
+
+<video id="video" width="160" height="120"  autoplay></video>
+
+<button id="melancholysound">melancholy</button>
+<button id="sunnysound">sunny</button>
+<button id="hopesound">hopeful</button>
+<button id="calmsound">calm</button>
+<button id="serioussound">serious</button>
+<button id="happysound">happy</button>
+
+
+
+<p id = "results1"></p>
+
+<script>
+
+
+
+
+
+
+//Tone.Transport.bpm.value = 200;
+
+
+
+  var screenArea;
+  var classifier = ml5.imageClassifier('https://teachablemachine.withgoogle.com/models/iqtLx1xZs/model.json', modelLoaded);
+  var dir;
+  let video = document.getElementById('video');
+
+
+  // When the model is loaded
+  function modelLoaded() {
+    console.log('Model Loaded!');
+
+  }
+
+
+
+    ///plays video pretty much
+function vidSetup(){
+
+      video.style.transform = 'scale(-1, 1)';
+
+      navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+          video.srcObject = stream;
+          video.play();
+        });
+      }
+
+
+  vidSetup();
+
+      this.canvas = document.createElement("canvas");
+      document.getElementById("canvascontainer").appendChild(this.canvas);
+
+
+
+
+var frameinterval=setInterval(videoClassification, 1000);
+
+function videoClassification() {
+
+              document.getElementById('results1').innerHTML = "";
+              classifier.classify(document.getElementById('video'), (err, results) => {
+
+                printResults('results1', results);
+                var dir= document.getElementById('results1').innerHTML;
+                console.log(dir);
+
+
+                function printResults(results1, results){
+              let res = document.getElementById('results1');
+              //let res = document.getElementById('outId');
+              res.innerHTML +=  results[0].label;
+
+                  }
+
+
+
+
+
+
+
+
+
+
+                if (dir == 'left') {
+
+                  hopearp(); EmChord(); Ebass();
+
+
+                  };
+                if (dir == 'right') {
+                  Dbass(); melancholyarp();DmChord();
+
+                  };
+                if (dir == 'down') {
+                  seriousarp();  AmChord(); Abass();
+
+                };
+
+                if (dir == 'up') {
+                  sunnyarp(); GChord();    Gbass();
+
+                  };
+
+                if (dir == 'neutral') {
+                  calmarp(); FChord(); Fbass();
+
+
+
+                  };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+              });
+
+
+  }
+
+
+Tone.Transport.bpm.value = 120;
+
+
+  ///Tone.Transport.bpm.value = 80;
+
+  ////connect to melancholyarp button
+  var melancholysound = document.getElementById("melancholysound");
+
+    melancholysound.addEventListener("click", function(){
+
+        melancholyarp();
+        DmChord()
+    Dbass();
+
+
+        });
+
+
+  ////connect to sunnysound button
+  var sunnysound = document.getElementById("sunnysound");
+
+    sunnysound.addEventListener("click", function(){
+
+        sunnyarp();
+        GChord();
+        Gbass();
+        });
+
+  var hopesound = document.getElementById("hopesound");
+
+      hopesound.addEventListener("click", function(){
+
+            hopearp();
+              EmChord();
+              Ebass();
+              });
+
+  var seriousound = document.getElementById("serioussound");
+
+        serioussound.addEventListener("click", function(){
+
+              seriousarp();
+              AmChord()
+              Abass();
+                });
+
+  var calmsound = document.getElementById("calmsound");
+
+          calmsound.addEventListener("click", function(){
+
+    calmarp();
+          FChord();
+          Fbass();
+        });
+
+
+  var happysound = document.getElementById("happysound");
+
+                happysound.addEventListener("click", function(){
+    happyarp();
+
+                CChord();
+                Cbass();
+              });
+
+
+
+
+
+  ///GLOBAL VARIABLES
+
+  var arpseq;
+  var leadseq;
+
+
+
+  /////BASS
+  var bassvol = new Tone.Volume(-4);
+  var bassdist = new Tone.Distortion(100);
+  var bassdist2 = new Tone.Distortion(.1);
+  var bassfilter = new Tone.Filter(250, "lowpass")
+
+  var bass = new Tone.MonoSynth({
+  	oscillator : {
+  		type : "square"
+   },
+
+   filter : {
+   Q : 4 ,
+   type : "lowpass",
+   rolloff : -24
+   } ,
+
+   envelope : {
+     attack : 0.09 ,
+    decay : 0.1 ,
+    sustain : 0.1 ,
+    release : .001
+  },
+  filterEnvelope : {
+  attack : .001 ,
+  decay : 0.002 ,
+  sustain : 0.1 ,
+  release : 0.05 ,
+  baseFrequency : 100 ,
+  octaves : 6 ,
+  exponent : 2
+  }
+
+  }).chain( bassdist, bassfilter,bassdist2,bassvol,  Tone.Master);
+
+
+  function Dbass(){
+        bass.triggerAttackRelease("d1", "2n");
+      };
+
+  function Gbass(){
+            bass.triggerAttackRelease("g1", "2n");
+          };
+
+
+  function Ebass(){
+                bass.triggerAttackRelease("e1", "2n");
+              };
+
+  function Fbass(){
+    bass.triggerAttackRelease("F1", "2n");
+    };
+
+
+  function Abass(){
+      bass.triggerAttackRelease("a1", "2n");
+      };
+
+      function Cbass(){
+          bass.triggerAttackRelease("C1", "2n");
+          };
+
+
+
+
+  ///POLY SYNTH EFFECTS
+
+  ///const distortion = new Tone.Distortion(0.4).toMaster();
+  var freeverb = new Tone.Freeverb(0.2,3000);
+  var polyfilter = new Tone.Filter(500, "lowpass")
+  var vol1 = new Tone.Volume(-15);
+  var polyPong = new Tone.PingPongDelay("64n", 0.1)
+  polyPong.wet.value = 0.5;
+
+  var polySynth = new Tone.PolySynth(6, Tone.Synth, {
+    oscillator : {
+  		type : "sawtooth"
+  	}
+  }).chain(vol1, polyfilter,polyPong, freeverb, Tone.Master);
+
+
+  ///POLYSYNTH CHORDS
+
+  function DmChord(){
+                  polySynth.triggerAttackRelease(['D2','D3','F4', 'A4','C4'],"2n");
+              }
+
+  function GChord(){
+                      polySynth.triggerAttackRelease(['G1','G2','G3','B4', 'D4', 'G4'],"2n");
+                  }
+
+  function EmChord(){
+            polySynth.triggerAttackRelease(['E2', 'G4','E4','C4',],"2n");
+                                }
+
+  function FChord(){
+      polySynth.triggerAttackRelease(['F1','F2','F3','A3', 'C4', 'A4'],"2n");
+                                                }
+
+
+function AmChord(){
+  polySynth.triggerAttackRelease(['A1','A2', 'C4', 'E4','A4'],"2n");
+    }
+
+  function CChord(){
+      //polySynth.triggerAttack(['C2','C3', 'E4', 'G4', 'B4'], "", 0.2);
+      polySynth.triggerAttackRelease(['C2','C3', 'E4', 'G4', 'C4'], "2n");
+        }
+
+  ///ARP EFFECTS
+
+  var vol2 = new Tone.Volume(-15);
+  var fbDelay = new Tone.FeedbackDelay("16n", 0.1);
+  fbDelay.wet.value = 0.1;
+
+  var arpverb = new Tone.Freeverb(0.4,3000);
+  arpverb.wet.value = .5;
+  var arpPong = new Tone.PingPongDelay("32n", 0.1)
+  arpPong.wet.value = 0.8;
+
+  const arpsynth = new Tone.MonoSynth({
+  	"oscillator" : {
+  		"type" : "sawtooth"
+   },
+
+   filter : {
+   Q : 2 ,
+   type : "lowpass",
+   rolloff : -12
+   } ,
+
+   envelope : {
+     attack : 0.0009 ,
+    decay : 0.4 ,
+    sustain : 0.5 ,
+    release : .000009
+  },
+  filterEnvelope : {
+  attack : 1 ,
+  decay : 0.002 ,
+  sustain : 0.9 ,
+  release : 0.5 ,
+  baseFrequency : 200 ,
+  octaves : 8 ,
+  exponent : 2
+  }
+
+  }).chain(vol2, fbDelay,arpPong, arpverb,Tone.Master);
+
+
+  function melancholyarp(){
+    Tone.Transport.stop();
+     Tone.Transport.cancel();
+
+    const notes2 = [
+    null,
+      "A3",
+      "C4",
+      "E4",
+      "F4",
+      "C4",
+      "A3",
+    null,
+    null,
+      "C4",
+      "E4",
+      "C4",
+      "F4",
+      "E4",
+        "C5",
+      null,
+
+    ];
+      const arpseq = new Tone.Sequence(
+        function(time, note) {
+          arpsynth.triggerAttackRelease(note, '.065', time);
+        },
+        notes2,
+        "32n"
+      );
+    // Setup the synth to be ready to play on beat 1
+    arpseq.loop = 8;
+  arpseq.start();
+  arpseq.stop("2n");
+
+  Tone.Transport.start();
+
+  }
+
+  function sunnyarp(){
+    Tone.Transport.stop();
+     Tone.Transport.cancel();
+    const notes1 = [
+    null,
+      "G3",
+      "B3",
+      "D4",
+    "B3",
+      "D4",
+      "B4",
+    null,
+    null,
+    "B3",
+    "D4",
+  "B4",
+  "G4",
+  "B4",
+  "D4",
+
+    null,
+    ];
+    const notes2 = [
+    null,
+      "G3",
+      "B4",
+      "D4",
+      "G4",
+      "D4",
+      "B4",
+    null,
+    null,
+    "B4",
+    "D4",
+  "B4",
+  "G4",
+  "B4",
+  "D4",
+
+    null,
+    ];
+
+
+      const arpseq = new Tone.Sequence(
+        function(time, note) {
+          arpsynth.triggerAttackRelease(note, '.065', time);
+        },
+        notes1,
+        "32n"
+      );
+    // Setup the synth to be ready to play on beat 1
+    arpseq.loop = 8;
+  arpseq.start();
+  arpseq.stop("2n");
+
+  Tone.Transport.start();
+
+  }
+
+  function hopearp(){
+    Tone.Transport.stop();
+     Tone.Transport.cancel();
+    const notes1 = [
+    null,
+      "G3",
+      "C4",
+      "D4",
+      "G4",
+      "D4",
+      "B4",
+
+    null,
+    null,
+    "E3",
+    "G3",
+    "C4",
+    "E4",
+    "G4",
+      "C5",
+    null,
+    ];
+
+
+
+  const arpseq = new Tone.Sequence(
+        function(time, note) {
+          arpsynth.triggerAttackRelease(note, '.065', time);
+        },
+        notes1,
+        "32n"
+      );
+    // Setup the synth to be ready to play on beat 1
+  arpseq.loop = 8;
+  arpseq.start();
+  arpseq.stop("2n");
+
+  Tone.Transport.start();
+
+  }
+
+  function calmarp(){
+    Tone.Transport.stop();
+     Tone.Transport.cancel();
+    const notes1 = [
+    null,
+
+      "C4",
+      "E4",
+      "F4",
+          "G4",
+      "C4",
+      "A3",
+    null,
+    null,
+      "C4",
+      "E4",
+      "C4",
+      "F4",
+      "E4",
+        "G4",
+      null,
+
+    ];
+    const notes2 = [
+    null,
+      "A3",
+      "C4",
+      "E4",
+      "F4",
+      "C4",
+      "A3",
+    null,
+    null,
+      "C4",
+      "E4",
+      "C4",
+      "F4",
+      "E4",
+        "C5",
+      null,
+
+    ];
+
+
+
+  const arpseq = new Tone.Sequence(
+        function(time, note) {
+          arpsynth.triggerAttackRelease(note, '.065', time);
+        },
+        notes1,
+        "32n"
+      );
+    // Setup the synth to be ready to play on beat 1
+    arpseq.loop = 8;
+  arpseq.start();
+  arpseq.stop("2n");
+
+  Tone.Transport.start();
+
+  }
+
+  function seriousarp(){
+    Tone.Transport.cancel();
+    Tone.Transport.stop();
+
+    const notesx = [
+    null,
+    "A3",
+    "C4",
+  "E3",
+  "G3",
+      "G4",
+      "c4",
+
+    null,
+    null,
+    "A3",
+    "C3",
+  "E3",
+  "G4",
+      "A4",
+      "C4",
+    null,
+    ];
+
+
+  const arpseq = new Tone.Sequence(
+        function(time, note) {
+          arpsynth.triggerAttackRelease(note, '.065', time);
+        },
+        notesx,
+        "32n"
+      );
+    // Setup the synth to be ready to play on beat 1
+
+  arpseq.start();
+  arpseq.stop("2n");
+
+  Tone.Transport.start();
+
+  }
+
+  function happyarp(){
+
+    Tone.Transport.cancel();
+    Tone.Transport.stop();
+
+    const notesx = [
+    null,
+    "C3",
+  "E3",
+  "g3",
+  "B3",
+      "G4",
+      "C4",
+    null,
+    null,
+    "C3",
+    "E3",
+    "G3",
+      "G4",
+      "b3",
+    "e4",
+
+    null,
+    ];
+
+
+  const arpseq = new Tone.Sequence(
+
+        function(time, note) {
+          arpsynth.triggerAttackRelease(note, '.065', time);
+        },
+        notesx,
+        "32n"
+      );
+    // Setup the synth to be ready to play on beat 1
+
+  arpseq.start();
+
+  arpseq.stop("2n");
+
+  Tone.Transport.start();
+
+
+  }
+
+
+
+
+  const arpsynth2 = new Tone.MonoSynth({
+  	"oscillator" : {
+  		"type" : "sawtooth"
+   },
+   filter : {
+   Q : 2 ,
+   type : "lowpass",
+   rolloff : -12
+   } ,
+
+   envelope : {
+     attack : 0.0009 ,
+    decay : 0.4 ,
+    sustain : 0.9 ,
+    release : .9
+  },
+  filterEnvelope : {
+  attack : 1 ,
+  decay : 0.002 ,
+  sustain : 0.9 ,
+  release : 0.5 ,
+  baseFrequency : 700 ,
+  octaves : 8 ,
+  exponent : 2
+  }}).chain(vol2, fbDelay,arpPong, arpverb,Tone.Master);
+
+
+
+
+
+
+
+</script>
+
+
+</body>
+</html>
